@@ -10,16 +10,26 @@ const db = mysql.createConnection({
     port: process.env.DB_PORT
 });
 
-db.connect((err) => {
+function connectDatabase() {
 
-    if (err) {
-        console.error("❌ Database Connection Failed");
-        console.error(err.message);
-        process.exit(1);
-    }
+    db.connect((err) => {
 
-    console.log("✅ MySQL Connected Successfully");
+        if (err) {
 
-});
+            console.log("❌ MySQL not ready. Retrying in 5 seconds...");
+            console.log(err.message);
+
+            setTimeout(connectDatabase, 5000);
+
+            return;
+        }
+
+        console.log("✅ MySQL Connected Successfully");
+
+    });
+
+}
+
+connectDatabase();
 
 module.exports = db;
