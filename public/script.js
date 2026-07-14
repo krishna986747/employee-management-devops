@@ -72,9 +72,8 @@ employeeForm.addEventListener("submit", async (e) => {
 
     } else {
 
-        await fetch(`${apiUrl}/${employeeId.value}`, {
-
-            method: "PUT",
+await fetch(`${apiUrl}/update/${employeeId.value}`, {
+    method: "POST",
 
             headers: {
                 "Content-Type": "application/json"
@@ -119,11 +118,10 @@ async function deleteEmployee(id) {
 
     if (!confirm("Delete this employee?")) return;
 
-    await fetch(`${apiUrl}/${id}`, {
 
-        method: "DELETE"
-
-    });
+await fetch(`${apiUrl}/delete/${id}`, {
+    method: "POST",
+});
 
     loadEmployees();
 

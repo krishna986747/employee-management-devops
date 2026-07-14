@@ -138,7 +138,7 @@ app.post("/employees", (req, res) => {
    UPDATE EMPLOYEE
 ========================================== */
 
-app.put("/employees/:id", (req, res) => {
+app.post("/employees/update/:id", (req, res) => {
 
     const id = req.params.id;
 
@@ -183,7 +183,7 @@ app.put("/employees/:id", (req, res) => {
    DELETE EMPLOYEE
 ========================================== */
 
-app.delete("/employees/:id", (req, res) => {
+app.post("/employees/delete/:id", (req, res) => {
 
     const id = req.params.id;
 
