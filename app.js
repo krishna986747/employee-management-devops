@@ -1,262 +1,288 @@
-require("dotenv").config();
+// ======================================
+// Import Required Packages
+// ======================================
 
-const express = require("express");
-const path = require("path");
-const db = require("./db");
+var express = require("express");
+var dotenv = require("dotenv");
+var db = require("./db");
 
-const app = express();
+// Read .env File
+dotenv.config();
 
+
+// ======================================
+// Create Express Application
+// ======================================
+
+var app = express();
+
+
+// ======================================
 // Middleware
+// ======================================
+
+// Read JSON Data
 app.use(express.json());
+
+// Read Form Data
 app.use(express.urlencoded({ extended: true }));
 
-// Static Files
-app.use(express.static(path.join(__dirname, "public")));
+// Access Public Folder
+app.use(express.static("public"));
 
+
+// ======================================
 // Home Page
-app.get("/", (req, res) => {
-    res.sendFile(path.join(__dirname, "public", "index.html"));
-});
+// ======================================
 
-/* ==========================================
-   GET ALL EMPLOYEES
-========================================== */
+app.get("/", function (req, res) {
 
-app.get("/employees", (req, res) => {
-
-    const sql = "SELECT * FROM employees ORDER BY id DESC";
-
-    db.query(sql, (err, result) => {
-
-        if (err) {
-            return res.status(500).json({
-                success: false,
-                message: err.message
-            });
-        }
-
-        res.status(200).json({
-            success: true,
-            count: result.length,
-            data: result
-        });
-
-    });
+    res.sendFile(__dirname + "/public/index.html");
 
 });
+// ======================================
+// Get All Employees
+// ======================================
 
+app.get("/employees", function (req, res) {
 
-/* ==========================================
-   GET SINGLE EMPLOYEE
-========================================== */
+    var sql = "SELECT * FROM employees ORDER BY id DESC";
 
-app.get("/employees/:id", (req, res) => {
+    db.query(sql, function (error, result) {
 
-    const id = req.params.id;
-
-    const sql = "SELECT * FROM employees WHERE id=?";
-
-    db.query(sql, [id], (err, result) => {
-
-        if (err) {
-
-            return res.status(500).json({
-                success: false,
-                message: err.message
-            });
-
-        }
-
-        if (result.length === 0) {
-
-            return res.status(404).json({
-                success: false,
-                message: "Employee not found"
-            });
-
-        }
-
-        res.status(200).json({
-            success: true,
-            data: result[0]
-        });
-
-    });
-
-});
-
-
-/* ==========================================
-   ADD EMPLOYEE
-========================================== */
-
-app.post("/employees", (req, res) => {
-
-    const { name, email, department, salary } = req.body;
-
-    if (!name || !email || !department || !salary) {
-
-        return res.status(400).json({
-            success: false,
-            message: "All fields are required"
-        });
-
-    }
-
-    const sql = `
-        INSERT INTO employees
-        (name,email,department,salary)
-        VALUES(?,?,?,?)
-    `;
-
-    db.query(
-        sql,
-        [name, email, department, salary],
-        (err, result) => {
-
-            if (err) {
-
-                return res.status(500).json({
-                    success: false,
-                    message: err.message
-                });
-
-            }
-
-            res.status(201).json({
-                success: true,
-                message: "Employee Added Successfully"
-            });
-
-        }
-    );
-
-});
-
-
-/* ==========================================
-   UPDATE EMPLOYEE
-========================================== */
-
-app.post("/employees/update/:id", (req, res) => {
-
-    const id = req.params.id;
-
-    const { name, email, department, salary } = req.body;
-
-    const sql = `
-        UPDATE employees
-        SET
-        name=?,
-        email=?,
-        department=?,
-        salary=?
-        WHERE id=?
-    `;
-
-    db.query(
-        sql,
-        [name, email, department, salary, id],
-        (err) => {
-
-            if (err) {
-
-                return res.status(500).json({
-                    success: false,
-                    message: err.message
-                });
-
-            }
+        if (error) {
 
             res.json({
-                success: true,
-                message: "Employee Updated Successfully"
-            });
 
-        }
-    );
-
-});
-
-
-/* ==========================================
-   DELETE EMPLOYEE
-========================================== */
-
-app.post("/employees/delete/:id", (req, res) => {
-
-    const id = req.params.id;
-
-    const sql = "DELETE FROM employees WHERE id=?";
-
-    db.query(sql, [id], (err) => {
-
-        if (err) {
-
-            return res.status(500).json({
                 success: false,
-                message: err.message
+                message: error.message
+
+            });
+
+        } else {
+
+            res.json({
+
+                success: true,
+                data: result
+
             });
 
         }
-
-        res.json({
-            success: true,
-            message: "Employee Deleted Successfully"
-        });
 
     });
 
 });
 
 
-/* ==========================================
-   SEARCH EMPLOYEE
-========================================== */
+// ======================================
+// Get Single Employee
+// ======================================
 
-app.get("/search/:keyword", (req, res) => {
+app.get("/employees/:id", function (req, res) {
 
-    const keyword = "%" + req.params.keyword + "%";
+    var id = req.params.id;
 
-    const sql = `
-        SELECT *
-        FROM employees
+    var sql = "SELECT * FROM employees WHERE id = ?";
+
+    db.query(sql, [id], function (error, result) {
+
+        if (error) {
+
+            res.json({
+
+                success: false,
+                message: error.message
+
+            });
+
+        } else {
+
+            res.json({
+
+                success: true,
+                data: result[0]
+
+            });
+
+        }
+
+    });
+
+});
+// ======================================
+// Add Employee
+// ======================================
+
+app.post("/employees", function (req, res) {
+
+    var name = req.body.name;
+    var email = req.body.email;
+    var department = req.body.department;
+    var salary = req.body.salary;
+
+    var sql = "INSERT INTO employees (name, email, department, salary) VALUES (?, ?, ?, ?)";
+
+    db.query(sql, [name, email, department, salary], function (error, result) {
+
+        if (error) {
+
+            res.json({
+
+                success: false,
+                message: error.message
+
+            });
+
+        } else {
+
+            res.json({
+
+                success: true,
+                message: "Employee Added Successfully"
+
+            });
+
+        }
+
+    });
+
+});
+
+
+// ======================================
+// Update Employee
+// ======================================
+
+app.post("/employees/update/:id", function (req, res) {
+
+    var id = req.params.id;
+
+    var name = req.body.name;
+    var email = req.body.email;
+    var department = req.body.department;
+    var salary = req.body.salary;
+
+    var sql = "UPDATE employees SET name=?, email=?, department=?, salary=? WHERE id=?";
+
+    db.query(sql, [name, email, department, salary, id], function (error, result) {
+
+        if (error) {
+
+            res.json({
+
+                success: false,
+                message: error.message
+
+            });
+
+        } else {
+
+            res.json({
+
+                success: true,
+                message: "Employee Updated Successfully"
+
+            });
+
+        }
+
+    });
+
+});
+
+// ======================================
+// Delete Employee
+// ======================================
+
+app.post("/employees/delete/:id", function (req, res) {
+
+    var id = req.params.id;
+
+    var sql = "DELETE FROM employees WHERE id = ?";
+
+    db.query(sql, [id], function (error, result) {
+
+        if (error) {
+
+            res.json({
+
+                success: false,
+                message: error.message
+
+            });
+
+        } else {
+
+            res.json({
+
+                success: true,
+                message: "Employee Deleted Successfully"
+
+            });
+
+        }
+
+    });
+
+});
+
+
+// ======================================
+// Search Employee
+// ======================================
+
+app.get("/search/:keyword", function (req, res) {
+
+    var keyword = "%" + req.params.keyword + "%";
+
+    var sql = `
+        SELECT * FROM employees
         WHERE
         name LIKE ?
         OR email LIKE ?
         OR department LIKE ?
+        ORDER BY id DESC
     `;
 
-    db.query(
-        sql,
-        [keyword, keyword, keyword],
-        (err, result) => {
+    db.query(sql, [keyword, keyword, keyword], function (error, result) {
 
-            if (err) {
-
-                return res.status(500).json({
-                    success: false,
-                    message: err.message
-                });
-
-            }
+        if (error) {
 
             res.json({
+
+                success: false,
+                message: error.message
+
+            });
+
+        } else {
+
+            res.json({
+
                 success: true,
-                count: result.length,
                 data: result
+
             });
 
         }
-    );
+
+    });
 
 });
+ 
+// ======================================
+// Start Server
+// ======================================
 
+var PORT = process.env.PORT || 3000;
 
-const PORT = process.env.PORT || 3000;
+app.listen(PORT, function () {
 
-app.listen(PORT, () => {
-
-    console.log(`🚀 Server Running on http://localhost:${PORT}`);
+    console.log("====================================");
+    console.log("Employee Management System Started");
+    console.log("Server Running on Port : " + PORT);
+    console.log("http://localhost:" + PORT);
+    console.log("====================================");
 
 });

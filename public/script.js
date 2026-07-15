@@ -1,138 +1,221 @@
-const apiUrl = "/employees";
+// ======================================
+// API URL
+// ======================================
 
-const employeeForm = document.getElementById("employeeForm");
-const employeeTable = document.getElementById("employeeTable");
-const searchInput = document.getElementById("search");
+var apiUrl = "/employees";
 
-const employeeId = document.getElementById("employeeId");
-const nameInput = document.getElementById("name");
-const emailInput = document.getElementById("email");
-const departmentInput = document.getElementById("department");
-const salaryInput = document.getElementById("salary");
-const submitBtn = document.getElementById("submitBtn");
 
-// Load Employees
-window.onload = () => {
+// ======================================
+// Get HTML Elements
+// ======================================
+
+var employeeForm = document.getElementById("employeeForm");
+
+var employeeTable = document.getElementById("employeeTable");
+
+var searchInput = document.getElementById("search");
+
+var employeeId = document.getElementById("employeeId");
+
+var nameInput = document.getElementById("name");
+
+var emailInput = document.getElementById("email");
+
+var departmentInput = document.getElementById("department");
+
+var salaryInput = document.getElementById("salary");
+
+var submitBtn = document.getElementById("submitBtn");
+
+
+// ======================================
+// Load Employees When Page Opens
+// ======================================
+
+window.onload = function () {
+
     loadEmployees();
+
 };
 
+
+// ======================================
 // Get All Employees
+// ======================================
+
 async function loadEmployees() {
 
-    const response = await fetch(apiUrl);
-    const result = await response.json();
+    var response = await fetch(apiUrl);
+
+    var result = await response.json();
 
     employeeTable.innerHTML = "";
 
-    result.data.forEach(emp => {
+    for (var i = 0; i < result.data.length; i++) {
 
-        employeeTable.innerHTML += `
-            <tr>
-                <td>${emp.id}</td>
-                <td>${emp.name}</td>
-                <td>${emp.email}</td>
-                <td>${emp.department}</td>
-                <td>${emp.salary}</td>
-                <td>
-                    <button class="edit-btn" onclick="editEmployee(${emp.id})">Edit</button>
-                    <button class="delete-btn" onclick="deleteEmployee(${emp.id})">Delete</button>
-                </td>
-            </tr>
-        `;
+        var emp = result.data[i];
 
-    });
+        employeeTable.innerHTML +=
+
+        "<tr>" +
+
+        "<td>" + emp.id + "</td>" +
+
+        "<td>" + emp.name + "</td>" +
+
+        "<td>" + emp.email + "</td>" +
+
+        "<td>" + emp.department + "</td>" +
+
+        "<td>" + emp.salary + "</td>" +
+
+        "<td>" +
+
+        "<button class='edit-btn' onclick='editEmployee(" + emp.id + ")'>Edit</button> " +
+
+        "<button class='delete-btn' onclick='deleteEmployee(" + emp.id + ")'>Delete</button>" +
+
+        "</td>" +
+
+        "</tr>";
+
+    }
 
 }
+// ======================================
+// Add Employee / Update Employee
+// ======================================
 
-// Add or Update Employee
-employeeForm.addEventListener("submit", async (e) => {
+employeeForm.addEventListener("submit", async function (event) {
 
-    e.preventDefault();
+    event.preventDefault();
 
-    const employee = {
+    var employee = {
+
         name: nameInput.value,
+
         email: emailInput.value,
+
         department: departmentInput.value,
+
         salary: salaryInput.value
+
     };
 
-    if (employeeId.value === "") {
+    if (employeeId.value == "") {
 
         await fetch(apiUrl, {
 
             method: "POST",
 
             headers: {
+
                 "Content-Type": "application/json"
+
             },
 
             body: JSON.stringify(employee)
 
         });
 
-    } else {
+        alert("Employee Added Successfully");
 
-await fetch(`${apiUrl}/update/${employeeId.value}`, {
-    method: "POST",
+    }
+
+    else {
+
+        await fetch(apiUrl + "/update/" + employeeId.value, {
+
+            method: "POST",
 
             headers: {
+
                 "Content-Type": "application/json"
+
             },
 
             body: JSON.stringify(employee)
 
         });
 
-        submitBtn.innerText = "Add Employee";
+        alert("Employee Updated Successfully");
+
+        submitBtn.innerHTML = "Add Employee";
 
     }
 
     employeeForm.reset();
+
     employeeId.value = "";
 
     loadEmployees();
 
 });
-
+// ======================================
 // Edit Employee
+// ======================================
+
 async function editEmployee(id) {
 
-    const response = await fetch(`${apiUrl}/${id}`);
+    var response = await fetch(apiUrl + "/" + id);
 
-    const result = await response.json();
+    var result = await response.json();
 
-    const emp = result.data;
+    var employee = result.data;
 
-    employeeId.value = emp.id;
-    nameInput.value = emp.name;
-    emailInput.value = emp.email;
-    departmentInput.value = emp.department;
-    salaryInput.value = emp.salary;
+    employeeId.value = employee.id;
 
-    submitBtn.innerText = "Update Employee";
+    nameInput.value = employee.name;
+
+    emailInput.value = employee.email;
+
+    departmentInput.value = employee.department;
+
+    salaryInput.value = employee.salary;
+
+    submitBtn.innerHTML = "Update Employee";
 
 }
 
+
+
+// ======================================
 // Delete Employee
+// ======================================
+
 async function deleteEmployee(id) {
 
-    if (!confirm("Delete this employee?")) return;
+    var answer = confirm("Do you want to delete this employee?");
 
+    if (answer == false) {
 
-await fetch(`${apiUrl}/delete/${id}`, {
-    method: "POST",
-});
+        return;
+
+    }
+
+    await fetch(apiUrl + "/delete/" + id, {
+
+        method: "POST"
+
+    });
+
+    alert("Employee Deleted Successfully");
 
     loadEmployees();
 
 }
 
+
+
+// ======================================
 // Search Employee
-searchInput.addEventListener("keyup", async () => {
+// ======================================
 
-    const keyword = searchInput.value.trim();
+searchInput.addEventListener("keyup", async function () {
 
-    if (keyword === "") {
+    var keyword = searchInput.value;
+
+    if (keyword == "") {
 
         loadEmployees();
 
@@ -140,28 +223,42 @@ searchInput.addEventListener("keyup", async () => {
 
     }
 
-    const response = await fetch(`/search/${keyword}`);
+    var response = await fetch("/search/" + keyword);
 
-    const result = await response.json();
+    var result = await response.json();
 
     employeeTable.innerHTML = "";
 
-    result.data.forEach(emp => {
+    var employees = result.data;
 
-        employeeTable.innerHTML += `
-            <tr>
-                <td>${emp.id}</td>
-                <td>${emp.name}</td>
-                <td>${emp.email}</td>
-                <td>${emp.department}</td>
-                <td>${emp.salary}</td>
-                <td>
-                    <button class="edit-btn" onclick="editEmployee(${emp.id})">Edit</button>
-                    <button class="delete-btn" onclick="deleteEmployee(${emp.id})">Delete</button>
-                </td>
-            </tr>
-        `;
+    for (var i = 0; i < employees.length; i++) {
 
-    });
+        var employee = employees[i];
+
+        employeeTable.innerHTML +=
+
+        "<tr>" +
+
+        "<td>" + employee.id + "</td>" +
+
+        "<td>" + employee.name + "</td>" +
+
+        "<td>" + employee.email + "</td>" +
+
+        "<td>" + employee.department + "</td>" +
+
+        "<td>" + employee.salary + "</td>" +
+
+        "<td>" +
+
+        "<button class='edit-btn' onclick='editEmployee(" + employee.id + ")'>Edit</button> " +
+
+        "<button class='delete-btn' onclick='deleteEmployee(" + employee.id + ")'>Delete</button>" +
+
+        "</td>" +
+
+        "</tr>";
+
+    }
 
 });

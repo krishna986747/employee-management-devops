@@ -1,95 +1,98 @@
 <!DOCTYPE html>
-<html lang="en">
+<html>
 
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
     <title>Employee Management System</title>
 
     <link rel="stylesheet" href="style.css">
+
 </head>
 
 <body>
 
-    <div class="container">
+    <h1>Employee Management System</h1>
 
-        <h1>Parajuli Group </h1>
+    <!-- Employee Form -->
 
-        <!-- Employee Form -->
+    <form id="employeeForm">
 
-        <form id="employeeForm">
+        <!-- Hidden ID (used when editing) -->
+        <input type="hidden" id="employeeId">
 
-            <input
-                type="hidden"
-                id="employeeId">
-
-            <input
-                type="text"
-                id="name"
-                placeholder="Employee Name"
-                required>
-
-            <input
-                type="email"
-                id="email"
-                placeholder="Employee Email"
-                required>
-
-            <input
-                type="text"
-                id="department"
-                placeholder="Department"
-                required>
-
-            <input
-                type="number"
-                id="salary"
-                placeholder="Salary"
-                required>
-
-            <button type="submit" id="submitBtn">
-                Add Employee
-            </button>
-
-        </form>
-
-        <hr>
-
-        <!-- Search -->
-
-        <input
-            type="text"
-            id="search"
-            placeholder="Search Employee...">
-
+        <!-- Employee Name -->
+        <label>Name</label><br>
+        <input type="text" id="name" placeholder="Enter Employee Name" required>
         <br><br>
 
-        <!-- Employee Table -->
+        <!-- Employee Email -->
+        <label>Email</label><br>
+        <input type="email" id="email" placeholder="Enter Employee Email" required>
+        <br><br>
 
-        <table>
+        <!-- Department -->
+        <label>Department</label><br>
+        <input type="text" id="department" placeholder="Enter Department" required>
+        <br><br>
 
-            <thead>
+        <!-- Salary -->
+        <label>Salary</label><br>
+        <input type="number" id="salary" placeholder="Enter Salary" required>
+        <br><br>
 
-                <tr>
+        <!-- Submit Button -->
+        <button type="submit" id="submitBtn">
+            Add Employee
+        </button>
 
-                    <th>ID</th>
-                    <th>Name</th>
-                    <th>Email</th>
-                    <th>Department</th>
-                    <th>Salary</th>
-                    <th>Action</th>
+    </form>
 
-                </tr>
+    <hr>
 
-            </thead>
+    <!-- Search Box -->
 
-            <tbody id="employeeTable">
+    <h3>Search Employee</h3>
 
-            </tbody>
+    <input
+        type="text"
+        id="search"
+        placeholder="Search by Name, Email or Department">
 
-        </table>
+    <br><br>
 
-    </div>
+    <!-- Employee Table -->
+
+    <table border="1" cellpadding="10">
+
+        <thead>
+
+            <tr>
+
+                <th>ID</th>
+
+                <th>Name</th>
+
+                <th>Email</th>
+
+                <th>Department</th>
+
+                <th>Salary</th>
+
+                <th>Action</th>
+
+            </tr>
+
+        </thead>
+
+        <tbody id="employeeTable">
+
+            <!-- JavaScript will add employee rows here -->
+
+        </tbody>
+
+    </table>
+
+    <!-- JavaScript File -->
 
     <script src="script.js"></script>
 
