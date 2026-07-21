@@ -1,264 +1,273 @@
-// ======================================
-// API URL
-// ======================================
+// ==========================================
+// Employee Management Script
+// ==========================================
 
-var apiUrl = "/employees";
+// Backend URL
+const api = "/employees";
 
-
-// ======================================
 // Get HTML Elements
-// ======================================
+const form = document.getElementById("employeeForm");
+const table = document.getElementById("employeeTable");
+const search = document.getElementById("search");
 
-var employeeForm = document.getElementById("employeeForm");
+const id = document.getElementById("employeeId");
+const name = document.getElementById("name");
+const email = document.getElementById("email");
+const department = document.getElementById("department");
+const salary = document.getElementById("salary");
 
-var employeeTable = document.getElementById("employeeTable");
+const button = document.getElementById("submitBtn");
 
-var searchInput = document.getElementById("search");
-
-var employeeId = document.getElementById("employeeId");
-
-var nameInput = document.getElementById("name");
-
-var emailInput = document.getElementById("email");
-
-var departmentInput = document.getElementById("department");
-
-var salaryInput = document.getElementById("salary");
-
-var submitBtn = document.getElementById("submitBtn");
-
-
-// ======================================
-// Load Employees When Page Opens
-// ======================================
+// ==========================================
+// Page Load
+// ==========================================
 
 window.onload = function () {
-
-    loadEmployees();
-
+    showEmployees();
 };
 
+// ==========================================
+// Show All Employees
+// ==========================================
 
-// ======================================
-// Get All Employees
-// ======================================
+async function showEmployees() {
 
-async function loadEmployees() {
+    // Ask server for employees
+    const response = await fetch(api);
 
-    var response = await fetch(apiUrl);
+    // Convert JSON into JavaScript object
+    const result = await response.json();
 
-    var result = await response.json();
+    // Clear table
+    table.innerHTML = "";
 
-    employeeTable.innerHTML = "";
+    // Loop through every employee
+    result.data.forEach(function(emp) {
 
-    for (var i = 0; i < result.data.length; i++) {
+        table.innerHTML += `
+        <tr>
 
-        var emp = result.data[i];
+            <td>${emp.id}</td>
 
-        employeeTable.innerHTML +=
+            <td>${emp.name}</td>
 
-        "<tr>" +
+            <td>${emp.email}</td>
 
-        "<td>" + emp.id + "</td>" +
+            <td>${emp.department}</td>
 
-        "<td>" + emp.name + "</td>" +
+            <td>${emp.salary}</td>
 
-        "<td>" + emp.email + "</td>" +
+            <td>
 
-        "<td>" + emp.department + "</td>" +
+                <button class="edit-btn" onclick="editEmployee(${emp.id})">
 
-        "<td>" + emp.salary + "</td>" +
+                    Edit
 
-        "<td>" +
+                </button>
 
-        "<button class='edit-btn' onclick='editEmployee(" + emp.id + ")'>Edit</button> " +
+                <button class="delete-btn" onclick="deleteEmployee(${emp.id})">
 
-        "<button class='delete-btn' onclick='deleteEmployee(" + emp.id + ")'>Delete</button>" +
+                    Delete
 
-        "</td>" +
+                </button>
 
-        "</tr>";
+            </td>
 
-    }
-
-}
-// ======================================
-// Add Employee / Update Employee
-// ======================================
-
-employeeForm.addEventListener("submit", async function (event) {
-
-    event.preventDefault();
-
-    var employee = {
-
-        name: nameInput.value,
-
-        email: emailInput.value,
-
-        department: departmentInput.value,
-
-        salary: salaryInput.value
-
-    };
-
-    if (employeeId.value == "") {
-
-        await fetch(apiUrl, {
-
-            method: "POST",
-
-            headers: {
-
-                "Content-Type": "application/json"
-
-            },
-
-            body: JSON.stringify(employee)
-
-        });
-
-        alert("Employee Added Successfully");
-
-    }
-
-    else {
-
-        await fetch(apiUrl + "/update/" + employeeId.value, {
-
-            method: "POST",
-
-            headers: {
-
-                "Content-Type": "application/json"
-
-            },
-
-            body: JSON.stringify(employee)
-
-        });
-
-        alert("Employee Updated Successfully");
-
-        submitBtn.innerHTML = "Add Employee";
-
-    }
-
-    employeeForm.reset();
-
-    employeeId.value = "";
-
-    loadEmployees();
-
-});
-// ======================================
-// Edit Employee
-// ======================================
-
-async function editEmployee(id) {
-
-    var response = await fetch(apiUrl + "/" + id);
-
-    var result = await response.json();
-
-    var employee = result.data;
-
-    employeeId.value = employee.id;
-
-    nameInput.value = employee.name;
-
-    emailInput.value = employee.email;
-
-    departmentInput.value = employee.department;
-
-    salaryInput.value = employee.salary;
-
-    submitBtn.innerHTML = "Update Employee";
-
-}
-
-
-
-// ======================================
-// Delete Employee
-// ======================================
-
-async function deleteEmployee(id) {
-
-    var answer = confirm("Do you want to delete this employee?");
-
-    if (answer == false) {
-
-        return;
-
-    }
-
-    await fetch(apiUrl + "/delete/" + id, {
-
-        method: "POST"
+        </tr>
+        `;
 
     });
 
-    alert("Employee Deleted Successfully");
+}
 
-    loadEmployees();
+// ==========================================
+// Add or Update Employee
+// ==========================================
+
+form.addEventListener("submit", async function(e){
+
+    // Stop page refresh
+    e.preventDefault();
+
+    // Create employee object
+    const employee = {
+
+        name: name.value,
+
+        email: email.value,
+
+        department: department.value,
+
+        salary: salary.value
+
+    };
+
+    // -----------------------
+    // ADD NEW EMPLOYEE
+    // -----------------------
+
+    if(id.value == ""){
+
+        await fetch(api,{
+
+            method:"POST",
+
+            headers:{
+                "Content-Type":"application/json"
+            },
+
+            body:JSON.stringify(employee)
+
+        });
+
+        alert("Employee Added");
+
+    }
+
+    // -----------------------
+    // UPDATE EMPLOYEE
+    // -----------------------
+
+    else{
+
+        await fetch(api+"/update/"+id.value,{
+
+            method:"POST",
+
+            headers:{
+                "Content-Type":"application/json"
+            },
+
+            body:JSON.stringify(employee)
+
+        });
+
+        alert("Employee Updated");
+
+        button.innerHTML="Add Employee";
+
+    }
+
+    // Clear form
+
+    form.reset();
+
+    id.value="";
+
+    showEmployees();
+
+});
+
+// ==========================================
+// Edit Employee
+// ==========================================
+
+async function editEmployee(employeeId){
+
+    const response = await fetch(api+"/"+employeeId);
+
+    const result = await response.json();
+
+    const emp = result.data;
+
+    id.value = emp.id;
+
+    name.value = emp.name;
+
+    email.value = emp.email;
+
+    department.value = emp.department;
+
+    salary.value = emp.salary;
+
+    button.innerHTML = "Update Employee";
 
 }
 
+// ==========================================
+// Delete Employee
+// ==========================================
 
+async function deleteEmployee(employeeId){
 
-// ======================================
-// Search Employee
-// ======================================
+    const ok = confirm("Delete this employee?");
 
-searchInput.addEventListener("keyup", async function () {
-
-    var keyword = searchInput.value;
-
-    if (keyword == "") {
-
-        loadEmployees();
+    if(!ok){
 
         return;
 
     }
 
-    var response = await fetch("/search/" + keyword);
+    await fetch(api+"/delete/"+employeeId,{
 
-    var result = await response.json();
+        method:"POST"
 
-    employeeTable.innerHTML = "";
+    });
 
-    var employees = result.data;
+    alert("Employee Deleted");
 
-    for (var i = 0; i < employees.length; i++) {
+    showEmployees();
 
-        var employee = employees[i];
+}
 
-        employeeTable.innerHTML +=
+// ==========================================
+// Search Employee
+// ==========================================
 
-        "<tr>" +
+search.addEventListener("keyup", async function(){
 
-        "<td>" + employee.id + "</td>" +
+    // Get search text
+    const keyword = search.value;
 
-        "<td>" + employee.name + "</td>" +
+    // Empty search
+    if(keyword==""){
 
-        "<td>" + employee.email + "</td>" +
+        showEmployees();
 
-        "<td>" + employee.department + "</td>" +
-
-        "<td>" + employee.salary + "</td>" +
-
-        "<td>" +
-
-        "<button class='edit-btn' onclick='editEmployee(" + employee.id + ")'>Edit</button> " +
-
-        "<button class='delete-btn' onclick='deleteEmployee(" + employee.id + ")'>Delete</button>" +
-
-        "</td>" +
-
-        "</tr>";
+        return;
 
     }
+
+    const response = await fetch("/search/"+keyword);
+
+    const result = await response.json();
+
+    table.innerHTML="";
+
+    result.data.forEach(function(emp){
+
+        table.innerHTML += `
+        <tr>
+
+            <td>${emp.id}</td>
+
+            <td>${emp.name}</td>
+
+            <td>${emp.email}</td>
+
+            <td>${emp.department}</td>
+
+            <td>${emp.salary}</td>
+
+            <td>
+
+                <button class="edit-btn" onclick="editEmployee(${emp.id})">
+
+                    Edit
+
+                </button>
+
+                <button class="delete-btn" onclick="deleteEmployee(${emp.id})">
+
+                    Delete
+
+                </button>
+
+            </td>
+
+        </tr>
+        `;
+
+    });
 
 });
