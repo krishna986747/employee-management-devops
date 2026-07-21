@@ -93,36 +93,40 @@ app.get("/employees/:id", function (req, res) {
 // Add Employee
 // ===============================
 
-app.post("/employees", function (req, res) {
+app.post("/employees", (req, res) => {
 
-    let name = req.body.name;
-    let email = req.body.email;
-    let department = req.body.department;
-    let salary = req.body.salary;
+    console.log(req.body);
 
-    let sql = "INSERT INTO employees(name,email,department,salary) VALUES(?,?,?,?)";
+    const { name, email, department, salary } = req.body;
 
-    db.query(sql, [name, email, department, salary], function (error) {
+    const sql = `
+    INSERT INTO employees(name,email,department,salary)
+    VALUES(?,?,?,?)
+    `;
 
-        if (error) {
+    db.query(sql, [name, email, department, salary], function(error, result){
 
-            res.json({
-                success: false,
-                message: error.message
+        if(error){
+
+            console.log(error);
+
+            return res.json({
+                success:false,
+                message:error.message
             });
 
-            return;
         }
 
+        console.log(result);
+
         res.json({
-            success: true,
-            message: "Employee Added Successfully"
+            success:true,
+            message:"Employee Added Successfully"
         });
 
     });
 
 });
-
 
 // ===============================
 // Update Employee
