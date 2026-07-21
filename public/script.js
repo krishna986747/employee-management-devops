@@ -1,74 +1,76 @@
-// ==========================================
-// Employee Management Script
-// ==========================================
+// ============================
+// API Address
+// ============================
 
-// Backend URL
-const api = "/employees";
+let api = "/employees";
 
+
+// ============================
 // Get HTML Elements
-const form = document.getElementById("employeeForm");
-const table = document.getElementById("employeeTable");
-const search = document.getElementById("search");
+// ============================
 
-const id = document.getElementById("employeeId");
-const name = document.getElementById("name");
-const email = document.getElementById("email");
-const department = document.getElementById("department");
-const salary = document.getElementById("salary");
+let form = document.getElementById("employeeForm");
 
-const button = document.getElementById("submitBtn");
+let table = document.getElementById("employeeTable");
 
-// ==========================================
-// Page Load
-// ==========================================
+let search = document.getElementById("search");
+
+let id = document.getElementById("employeeId");
+
+let name = document.getElementById("name");
+
+let email = document.getElementById("email");
+
+let department = document.getElementById("department");
+
+let salary = document.getElementById("salary");
+
+let button = document.getElementById("submitBtn");
+
+
+// ============================
+// Load Employees
+// ============================
 
 window.onload = function () {
+
     showEmployees();
+
 };
 
-// ==========================================
-// Show All Employees
-// ==========================================
+
+// ============================
+// Show Employees
+// ============================
 
 async function showEmployees() {
 
-    // Ask server for employees
-    const response = await fetch(api);
+    let response = await fetch(api);
 
-    // Convert JSON into JavaScript object
-    const result = await response.json();
+    let result = await response.json();
 
-    // Clear table
     table.innerHTML = "";
 
-    // Loop through every employee
-    result.data.forEach(function(emp) {
+    for (let i = 0; i < result.data.length; i++) {
+
+        let emp = result.data[i];
 
         table.innerHTML += `
         <tr>
-
             <td>${emp.id}</td>
-
             <td>${emp.name}</td>
-
             <td>${emp.email}</td>
-
             <td>${emp.department}</td>
-
             <td>${emp.salary}</td>
 
             <td>
 
-                <button class="edit-btn" onclick="editEmployee(${emp.id})">
-
+                <button onclick="editEmployee(${emp.id})">
                     Edit
-
                 </button>
 
-                <button class="delete-btn" onclick="deleteEmployee(${emp.id})">
-
+                <button onclick="deleteEmployee(${emp.id})">
                     Delete
-
                 </button>
 
             </td>
@@ -76,21 +78,20 @@ async function showEmployees() {
         </tr>
         `;
 
-    });
+    }
 
 }
 
-// ==========================================
-// Add or Update Employee
-// ==========================================
 
-form.addEventListener("submit", async function(e){
+// ============================
+// Add / Update Employee
+// ============================
 
-    // Stop page refresh
-    e.preventDefault();
+form.addEventListener("submit", async function (event) {
 
-    // Create employee object
-    const employee = {
+    event.preventDefault();
+
+    let employee = {
 
         name: name.value,
 
@@ -102,21 +103,20 @@ form.addEventListener("submit", async function(e){
 
     };
 
-    // -----------------------
-    // ADD NEW EMPLOYEE
-    // -----------------------
 
-    if(id.value == ""){
+    if (id.value == "") {
 
-        await fetch(api,{
+        await fetch(api, {
 
-            method:"POST",
+            method: "POST",
 
-            headers:{
-                "Content-Type":"application/json"
+            headers: {
+
+                "Content-Type": "application/json"
+
             },
 
-            body:JSON.stringify(employee)
+            body: JSON.stringify(employee)
 
         });
 
@@ -124,83 +124,82 @@ form.addEventListener("submit", async function(e){
 
     }
 
-    // -----------------------
-    // UPDATE EMPLOYEE
-    // -----------------------
+    else {
 
-    else{
+        await fetch(api + "/update/" + id.value, {
 
-        await fetch(api+"/update/"+id.value,{
+            method: "POST",
 
-            method:"POST",
+            headers: {
 
-            headers:{
-                "Content-Type":"application/json"
+                "Content-Type": "application/json"
+
             },
 
-            body:JSON.stringify(employee)
+            body: JSON.stringify(employee)
 
         });
 
         alert("Employee Updated");
 
-        button.innerHTML="Add Employee";
+        button.innerHTML = "Add Employee";
 
     }
 
-    // Clear form
 
     form.reset();
 
-    id.value="";
+    id.value = "";
 
     showEmployees();
 
 });
 
-// ==========================================
+
+// ============================
 // Edit Employee
-// ==========================================
+// ============================
 
-async function editEmployee(employeeId){
+async function editEmployee(employeeId) {
 
-    const response = await fetch(api+"/"+employeeId);
+    let response = await fetch(api + "/" + employeeId);
 
-    const result = await response.json();
+    let result = await response.json();
 
-    const emp = result.data;
+    let employee = result.data;
 
-    id.value = emp.id;
+    id.value = employee.id;
 
-    name.value = emp.name;
+    name.value = employee.name;
 
-    email.value = emp.email;
+    email.value = employee.email;
 
-    department.value = emp.department;
+    department.value = employee.department;
 
-    salary.value = emp.salary;
+    salary.value = employee.salary;
 
     button.innerHTML = "Update Employee";
 
 }
 
-// ==========================================
+
+// ============================
 // Delete Employee
-// ==========================================
+// ============================
 
-async function deleteEmployee(employeeId){
+async function deleteEmployee(employeeId) {
 
-    const ok = confirm("Delete this employee?");
+    let answer = confirm("Delete this employee?");
 
-    if(!ok){
+    if (answer == false) {
 
         return;
 
     }
 
-    await fetch(api+"/delete/"+employeeId,{
+    await fetch(api + "/delete/" + employeeId, {
 
-        method:"POST"
+        method: "POST"
 
     });
 
@@ -210,17 +209,16 @@ async function deleteEmployee(employeeId){
 
 }
 
-// ==========================================
+
+// ============================
 // Search Employee
-// ==========================================
+// ============================
 
-search.addEventListener("keyup", async function(){
+search.addEventListener("keyup", async function () {
 
-    // Get search text
-    const keyword = search.value;
+    let keyword = search.value;
 
-    // Empty search
-    if(keyword==""){
+    if (keyword == "") {
 
         showEmployees();
 
@@ -228,13 +226,15 @@ search.addEventListener("keyup", async function(){
 
     }
 
-    const response = await fetch("/search/"+keyword);
+    let response = await fetch("/search/" + keyword);
 
-    const result = await response.json();
+    let result = await response.json();
 
-    table.innerHTML="";
+    table.innerHTML = "";
 
-    result.data.forEach(function(emp){
+    for (let i = 0; i < result.data.length; i++) {
+
+        let emp = result.data[i];
 
         table.innerHTML += `
         <tr>
@@ -251,16 +251,12 @@ search.addEventListener("keyup", async function(){
 
             <td>
 
-                <button class="edit-btn" onclick="editEmployee(${emp.id})">
-
+                <button onclick="editEmployee(${emp.id})">
                     Edit
-
                 </button>
 
-                <button class="delete-btn" onclick="deleteEmployee(${emp.id})">
-
+                <button onclick="deleteEmployee(${emp.id})">
                     Delete
-
                 </button>
 
             </td>
@@ -268,6 +264,6 @@ search.addEventListener("keyup", async function(){
         </tr>
         `;
 
-    });
+    }
 
 });
