@@ -1,20 +1,22 @@
 #!/bin/bash
-set -e
 
 echo "========== DEPLOY START =========="
 
-cd /home/jelastic/employee-management
+cd /home/jelastic/employee-management || exit 1
 
-echo "Pulling latest code..."
-git pull origin main
+echo "Fetching latest code..."
+git fetch origin
+
+echo "Resetting to GitHub..."
+git reset --hard origin/main
 
 echo "Installing dependencies..."
 npm install
 
 echo "Restarting application..."
-pm2 restart employee-management
+pm2 restart employee-management --update-env
 
-echo "Saving PM2 configuration..."
+echo "Saving PM2..."
 pm2 save
 
 echo "========== DEPLOY SUCCESS =========="
